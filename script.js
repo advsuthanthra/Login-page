@@ -1,67 +1,118 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
 
-// Import modern modular Firebase SDK functions
-//import { initializeApp } from "https://gstatic.com";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
-
-// Replace this object with your official project credentials from the Firebase Console
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyBH5JYKydnAD7BDUXMp8jxQWmTbokISQos",
-    authDomain: "login-page-913ee.firebaseapp.com",
-    projectId: "login-page-913ee",
-    storageBucket: "login-page-913ee.firebasestorage.app",
-    messagingSenderId: "861653744843",
-    appId: "1:861653744843:web:88ef33e159c8d2c283af4e"
+/*const firebaseConfig = {
+  apiKey: "AIzaSyCybmXAUWgGDCMNQWvcRdaMgE31I1GkF8M",
+  authDomain: "log-in-authentication-ac1b6.firebaseapp.com",
+  projectId: "log-in-authentication-ac1b6",
+  storageBucket: "log-in-authentication-ac1b6.appspot.com",
+  messagingSenderId: "735126972855",
+  appId: "1:735126972855:web:b26c16bd1de14bf361e032",
+  measurementId: "G-3GKSESXV7S"
+};*/
+const firebaseConfig = {
+    apiKey: "AIzaSyD96y9HGI0EbaVcp9Vg_e1ZAOcWQyMfipE",
+    authDomain: "login-44cff.firebaseapp.com",
+    projectId: "login-44cff",
+    storageBucket: "login-44cff.firebasestorage.app",
+    messagingSenderId: "316207978856",
+    appId: "1:316207978856:web:48cd4d25b2b599a35f1edd"
   };
 
-  // Initialize Firebase
-  //const app = initializeApp(firebaseConfig);
-
-// Initialize app and structural references
 const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 const auth = getAuth(app);
 
-const loginForm = document.getElementById('loginForm');
-const errorText = document.getElementById('errorMessage');
+const submitButton = document.getElementById("submit");
+const signupButton = document.getElementById("sign-up");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const main = document.getElementById("main");
+const createacct = document.getElementById("create-acct")
 
-// Login form interceptor
-loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    errorText.textContent = ""; // Clear any previous errors
+const signupEmailIn = document.getElementById("email-signup");
+const confirmSignupEmailIn = document.getElementById("confirm-email-signup");
+const signupPasswordIn = document.getElementById("password-signup");
+const confirmSignUpPasswordIn = document.getElementById("confirm-password-signup");
+const createacctbtn = document.getElementById("create-acct-btn");
 
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+const returnBtn = document.getElementById("return-btn");
 
-    // Execution of Firebase authentication function
-    signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            alert(`Success! Logged in as: ${user.email}`);
-            // window.location.href = "dashboard.html"; // Optional redirect
-        })
-        .catch((error) => {
-            // Error code filter mapping
-            if (error.code === "auth/invalid-credential")
-          {
-                errorText.textContent = "Wrong email or password";
-            } else {
-                errorText.textContent = error.message;
-            }
-        });
+var email, password, signupEmail, signupPassword, confirmSignupEmail, confirmSignUpPassword;
+
+createacctbtn.addEventListener("click", function() {
+  var isVerified = true;
+
+  signupEmail = signupEmailIn.value;
+  confirmSignupEmail = confirmSignupEmailIn.value;
+  if(signupEmail != confirmSignupEmail) {
+      window.alert("Email fields do not match. Try again.")
+      isVerified = false;
+  }
+
+  signupPassword = signupPasswordIn.value;
+  confirmSignUpPassword = confirmSignUpPasswordIn.value;
+  if(signupPassword != confirmSignUpPassword) {
+      window.alert("Password fields do not match. Try again.")
+      isVerified = false;
+  }
+  
+  if(signupEmail == null || confirmSignupEmail == null || signupPassword == null || confirmSignUpPassword == null) {
+    window.alert("Please fill out all required fields.");
+    isVerified = false;
+  }
+  
+  if(isVerified) {
+    createUserWithEmailAndPassword(auth, signupEmail, signupPassword)
+      .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      // ...
+      window.alert("Success! Account created.");
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // ..
+      window.alert("Error occurred. Try again.");
+    });
+  }
 });
 
-const db = getFirestore(app);
+submitButton.addEventListener("click", function() {
+  email = emailInput.value;
+  console.log(email);
+  password = passwordInput.value;
+  console.log(password);
 
-// Get a list of cities from your database
-async function getCities(db) {
-  const citiesCol = collection(db, 'cities');
-  const citySnapshot = await getDocs(citiesCol);
-  const cityList = citySnapshot.docs.map(doc => doc.data());
-  return cityList;
-}
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      // Signed in
+      const user = userCredential.user;
+      console.log("Success! Welcome back!");
+      window.alert("Success! Welcome back!");
+      // ...
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log("Error occurred. Try again.");
+      window.alert("Error occurred. Try again.");
+    });
+});
+
+signupButton.addEventListener("click", function() {
+    main.style.display = "none";
+    createacct.style.display = "block";
+});
+
+returnBtn.addEventListener("click", function() {
+    main.style.display = "block";
+    createacct.style.display = "none";
+});
+
+  
+  
+
+
