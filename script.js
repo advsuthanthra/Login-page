@@ -2,6 +2,7 @@
 // Import modern modular Firebase SDK functions
 //import { initializeApp } from "https://gstatic.com";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 
 // Replace this object with your official project credentials from the Firebase Console
   // Import the functions you need from the SDKs you need
@@ -46,10 +47,21 @@ loginForm.addEventListener('submit', (e) => {
         })
         .catch((error) => {
             // Error code filter mapping
-            if (error.code === 'auth/invalid-credential') {
-                errorText.textContent = "Invalid login credentials match.";
+            if (error.code === "auth/invalid-credential")
+          {
+                errorText.textContent = "Wrong email or password";
             } else {
                 errorText.textContent = error.message;
             }
         });
 });
+
+const db = getFirestore(app);
+
+// Get a list of cities from your database
+async function getCities(db) {
+  const citiesCol = collection(db, 'cities');
+  const citySnapshot = await getDocs(citiesCol);
+  const cityList = citySnapshot.docs.map(doc => doc.data());
+  return cityList;
+}
