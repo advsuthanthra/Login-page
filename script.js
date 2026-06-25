@@ -592,14 +592,14 @@ document.getElementById('paymentMethod').value;
         remainingAmount
     };
 
-   /* purchases.push(purchase);
+   purchases.push(purchase);
 
 // Local backup
 localStorage.setItem(
     'purchases',
     JSON.stringify(purchases)
 );
-*/
+
 // Firebase server save
 try {
 
