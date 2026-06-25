@@ -1,11 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Login</title>
-  <link rel = "stylesheet" href = "main.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sri Krishna Blue Metals - Construction Materials</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <div class = "login-container">
+     <div id="loginPage" class="page">
+
+      <div class="login-container">
+
+        <div class="logo-section">
+            <img id="shopLogo" src="logo.png" alt="Logo" class="logo">
+        </div>
+
+
+        <h1 class="shop-name" data-t="shopName">
+            Sri Krishna Blue Metals
+        </h1>
+
+        <p class="shop-subtitle" data-t="shopSubtitle">
+            Construction Materials Sales
+        </p>
+          
+     <div class="login-form">
+        
     <div id= "main">
       <h1>Sign In</h1>
       <input id = "email" type = "text" placeholder = "Email"></input>
@@ -25,6 +46,342 @@
       <button id = "return-btn">Return to Login</button>
     </div>
   </div>
+</div>
+</div>
+         
+           <div id="statusPage" class="page hidden">
+        <div class="header">
+            <div class="header-left">
+                <img id="statusLogo" src="logo.png" alt="Logo" class="header-logo">
+                <h1 data-t="shopName">Sri Krishna Blue Metals</h1>
+            </div>
+            <div class="header-right">
+                <button onclick="showPendingReport()" class="notification-btn" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-count" id="notificationCount">0</span>
+                </button>
+                <button onclick="logout()" class="logout-btn" data-t="logout">Logout</button>
+            </div>
+        </div>
+               
+
+        <!-- Pending Report Modal -->
+        <div id="pendingReportModal" class="modal hidden">
+        <div class="modal-content">
+        <h2 data-t="pendingReport">Pending Amount Report</h2>
+        <div id="pendingReportContent" class="report-content">
+            <!-- Pending customers list -->
+            <div id="pendingCustomersList">
+                <!-- Customer entries will be added here dynamically -->
+            </div>
+        </div>
+        
+        <button onclick="closeModal('pendingReportModal')" class="close-btn" data-t="close">Close</button>
+    </div>
+</div>
+
+        <div class="main-content">
+            <!-- Left Side: Purchase Form -->
+            <div class="left-panel animate-purchase">
+                <div class="form-section">
+                    <h2 data-t="todayWork">Today's Work Status</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label data-t="date">Date:</label>
+                            <input type="date" id="purchaseDate" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label data-t="customerName">Customer Name:</label>
+                            <input type="text" id="customerName" placeholder="Enter customer name" class="form-input" data-p="enterCustomer">
+                          </div>
+                        
+                        <div class="form-group">
+                        <label>Customer Mobile:</label>
+                       <input type="number" id="customerMobile" placeholder="Enter mobile number"class="form-input">
+                        </div>
+                        <div class="form-group">
+                         <label>Delivery Place:</label>
+                       <input type="text" id="deliveryPlace" placeholder="Enter delivery location"class="form-input">
+                       </div>
+                        <!-- Cement -->
+                       <!-- Dalmia Cement -->
+<!-- Cement -->  
+                   <div id="cementContainer">
+
+    <div class="cement-row material-row">
+        <select class="cementType form-input">
+            <option value="dalmia">Dalmia</option>
+            <option value="ultraTech">UltraTech</option>
+        </select>
+
+        <input type="number" class="cementRate form-input"
+               placeholder="Rate" oninput="calculateAll()">
+
+        <input type="number" class="cementQty form-input"
+               placeholder="Qty" oninput="calculateAll()">
+
+        <input type="number" class="cementTotal form-input"
+               placeholder="Total" readonly>
+    </div>
+
+</div>
+
+<button type="button" onclick="addCementRow()"> + Add Cement</button>
+                        
+                        <!-- Jalli -->
+                      <div id="jalliContainer">
+    <div class="jalli-row material-row">
+        <select class="jalliType form-input">
+            <option value="3/4 Jalli">3/4 Jalli</option>
+            <option value="1 1/2 Jalli">1 1/2 Jalli</option>
+            <option value="Chips">Chips</option>
+            <option value="Gravel">Gravel</option>
+        </select>
+
+        <input type="number" class="jalliRate form-input" placeholder="Rate" oninput="calculateAll()">
+
+        <input type="number" class="jalliQty form-input" placeholder="Qty" oninput="calculateAll()">
+
+        <input type="number" class="jalliTotal form-input" placeholder="Total" readonly>
+    </div>
+</div>
+
+<button type="button" onclick="addJalliRow()">+ Add Jalli</button>
+                        <!-- Sand -->
+                        
+                       <div id="sandContainer">
+    <div class="sand-row material-row">
+        <select class="sandType form-input">
+            <option value="M Sand">M Sand</option>
+            <option value="P Sand">P Sand</option>
+            <option value="White M Sand">White M Sand</option>
+            <option value="Red White M Sand">Red White M Sand</option>
+        </select>
+
+        <input type="number" class="sandRate form-input" placeholder="Rate" oninput="calculateAll()">
+
+        <input type="number" class="sandQty form-input" placeholder="Qty" oninput="calculateAll()">
+
+        <input type="number" class="sandTotal form-input" placeholder="Total" readonly>
+    </div>
+</div>
+
+<button type="button" onclick="addSandRow()">+ Add Sand</button>
+                        <!-- Red Bricks -->
+                        <div id="redBricksContainer">
+    <div class="redBricks-row material-row">
+
+        <select class="redBricksType form-input">
+            <option value="9 Inch Red Brick">9 Inch Red Brick</option>
+            <option value="4.5 Inch Red Brick">4.5 Inch Red Brick</option>
+            <option value="Fly Ash Brick">Fly Ash Brick</option>
+            <option value="Hollow Brick">Hollow Brick</option>
+        </select>
+
+        <input type="number" class="redBricksRate form-input" placeholder="Rate" oninput="calculateAll()">
+
+        <input type="number" class="redBricksQty form-input" placeholder="Qty" oninput="calculateAll()">
+
+        <input type="number" class="redBricksTotal form-input" placeholder="Total" readonly>
+
+    </div>
+</div>
+ <button type="button" onclick="addredBricksRow()">+ Add redBricks</button>
+                        
+                        <!-- AAC Blocks -->
+                        <div id="aacContainer">
+    <div class="aac-row material-row">
+        <select class="aacType form-input">
+            <option value="4 Inch">4 Inch</option>
+            <option value="6 Inch">6 Inch</option>
+            <option value="9 Inch">9 Inch</option>
+        </select>
+
+        <input type="number" class="aacRate form-input" placeholder="Rate" oninput="calculateAll()">
+
+        <input type="number" class="aacQty form-input" placeholder="Qty" oninput="calculateAll()">
+
+        <input type="number" class="aacTotal form-input" placeholder="Total" readonly>
+    </div>
+</div>
+
+<button type="button" onclick="addAACRow()">+ Add AAC</button>
+                        <!-- Total -->
+                        <div class="form-group total-group">
+                            <label data-t="totalAmount">Total Amount (₹):</label>
+                            <input type="number" id="totalAmount" placeholder="0" value="0" class="form-input total-input" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label data-t="givenAmount">Given Amount (₹):</label>
+                            <input type="number" id="givenAmount" placeholder="0" value="0" class="form-input" oninput="calculateAll()">
+                        </div>
+                        <div class="form-group">
+                            <label data-t="remainingAmount">Remaining Amount (₹):</label>
+                            <input type="number" id="remainingAmount" placeholder="0" value="0" class="form-input remaining-input" readonly>
+                        </div>
+                        <div class="form-group">
+                         <label>Payment Method:</label>
+
+                <select id="paymentMethod" class="form-input">
+        <option value="Cash">Cash</option>
+        <option value="GPay">GPay</option>
+        <option value="PhonePe">PhonePe</option>
+    </select>
+</div>
+                    </div>
+                    <button onclick="addPurchase()" class="submit-btn animate-btn" data-t="addPurchase">Add Purchase</button>
+                </div>
+                
+ </div>
+ </div>
+               
+        <div class="button-group">
+   
+            <button onclick="showPreviousDayReport()" class="action-btn animate-btn" data-t="previousDay">Previous Day Report</button>
+            <button onclick="showTomorrowWork()" class="action-btn animate-btn" data-t="tomorrowWork">Tomorrow Work</button>
+            <button onclick="showPage('reportPage')" class="action-btn animate-btn" data-t="reports">Reports</button>
+            <button onclick="showPage('salesPage')" class="action-btn animate-btn" data-t="salesReports">Pending Reports</button>
+            <button onclick="testFirebase()">Test Firebase</button>
+        </div>
+
+        <div class="today-status">
+            <h2 data-t="todayPurchases">Today's Purchases</h2>
+            <div id="todayPurchases" class="purchase-list"></div>
+        </div>
+</div>
+ </div>
+
+ 
+
+    <!-- Report Page (Page 3) -->
+    <div id="reportPage" class="page hidden">
+        <div class="header">
+            <div class="header-left">
+                <img src="logo.png" alt="Logo" class="header-logo">
+                <h1 data-t="shopName">Sri Krishna Blue Metals</h1> - <span data-t="reports">Reports</span>
+            </div>
+            <div class="header-right">
+                <button onclick="showPendingReport()" class="notification-btn" id="notificationBtnReport">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-count" id="notificationCountReport">0</span>
+                </button>
+                <button onclick="logout()" class="logout-btn" data-t="logout">Logout</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <button onclick="showPage('statusPage')" class="back-btn animate-btn" data-t="backStatus">← Back to Status</button>
+
+            <div class="report-tabs">
+                <button onclick="showDayReport()" class="tab-btn active" data-tab="day" data-t="dayStatus">Day Status</button>
+                <button onclick="showMonthlyReport()" class="tab-btn" data-tab="monthly" data-t="monthlyStatus">Monthly Status</button>
+                <button onclick="showYearlyReport()" class="tab-btn" data-tab="yearly" data-t="yearlyStatus">Yearly Status</button>
+            </div>
+
+            <div id="dayReport" class="report-section">
+                <h2 data-t="dayReport">Day Status Report</h2>
+                <div class="date-selector">
+                    <label data-t="selectDate">Select Date:</label>
+                    <input type="date" id="dayReportDate" class="form-input">
+                    <button onclick="generateDayReport()" class="submit-btn animate-btn" data-t="generateReport">Generate Report</button>
+                    <button onclick="downloadPDF('day')" class="submit-btn animate-btn pdf-btn" data-t="downloadPDF">Download PDF</button>
+                </div>
+                <div id="dayReportContent" class="report-content"></div>
+            </div>
+
+            <div id="monthlyReport" class="report-section hidden">
+                <h2 data-t="monthlyReport">Monthly Status Report</h2>
+                <div class="date-selector">
+                    <label data-t="selectMonth">Select Month:</label>
+                    <input type="month" id="monthlyReportMonth" class="form-input">
+                    <button onclick="generateMonthlyReport()" class="submit-btn animate-btn" data-t="generateReport">Generate Report</button>
+                    <button onclick="downloadPDF('monthly')" class="submit-btn animate-btn pdf-btn" data-t="downloadPDF">Download PDF</button>
+                </div>
+                <div id="monthlyReportContent" class="report-content"></div>
+            </div>
+
+            <div id="yearlyReport" class="report-section hidden">
+                <h2 data-t="yearlyReport">Yearly Status Report</h2>
+                <div class="date-selector">
+                    <label data-t="selectYear">Select Year:</label>
+                    <input type="number" id="yearlyReportYear" placeholder="2026" value="2026" class="form-input">
+                    <button onclick="generateYearlyReport()" class="submit-btn animate-btn" data-t="generateReport">Generate Report</button>
+                    <button onclick="downloadPDF('yearly')" class="submit-btn animate-btn pdf-btn" data-t="downloadPDF">Download PDF</button>
+                </div>
+                <div id="yearlyReportContent" class="report-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales & Reports Page (Page 4) -->
+    <div id="salesPage" class="page hidden">
+        <div class="header">
+            <div class="header-left">
+                <img src="logo.png" alt="Logo" class="header-logo">
+                <h1 data-t="shopName">Sri Krishna Blue Metals</h1> - <span data-t="salesReports">Sales & Reports</span>
+            </div>
+            <div class="header-right">
+                <button onclick="showPendingReport()" class="notification-btn" id="notificationBtnSales">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-count" id="notificationCountSales">0</span>
+                </button>
+                <button onclick="logout()" class="logout-btn" data-t="logout">Logout</button>    
+            </div>
+        </div>
+
+<div class="content">
+            <button onclick="showPage('statusPage')" class="back-btn animate-btn" data-t="backStatus">← Back to Status</button>
+            <div class="pending-customers">
+                <h2 data-t="pendingAlert">Pending Customers Alert</h2>
+                <div class="form-group">
+                    <label data-t="checkCustomer">Enter Customer Name to Check:</label>
+                    <input type="text" id="checkCustomerName" placeholder="Enter customer name" class="form-input" data-p="enterCustomer">
+                    <button onclick="checkPendingCustomer()" class="submit-btn animate-btn" data-t="check">Check</button>
+                </div>
+                <div id="pendingAlert" class="pending-alert"></div>
+                <div id="pendingCustomersList" class="purchase-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Previous Day Report Modal -->
+    <div id="previousDayModal" class="modal hidden">
+        <div class="modal-content">
+            <h2 data-t="previousDay">Previous Day Report</h2>
+            <div id="previousDayContent" class="report-content"></div>
+            <button onclick="closeModal('previousDayModal')" class="close-btn animate-btn" data-t="close">Close</button>
+        </div>
+    </div>
+
+    <!-- Tomorrow Work Modal -->
+    <div id="tomorrowModal" class="modal hidden">
+        <div class="modal-content">
+            <h2 data-t="tomorrowWork">Tomorrow's Work</h2>
+            <div class="form-group">
+                <label data-t="date">Date:</label>
+                <input type="date" id="tomorrowDate" class="form-input">
+            </div>
+            <div class="form-group">
+                <label data-t="customerName">Customer Name:</label>
+                <input type="text" id="tomorrowCustomer" placeholder="Enter customer name" class="form-input" data-p="enterCustomer">
+            </div>
+            <div class="form-group">
+                <label data-t="workDesc">Work Description:</label>
+                <input type="text" id="tomorrowWork" placeholder="Enter work description" class="form-input">
+            </div>
+            <button onclick="addTomorrowWork()" class="submit-btn animate-btn" data-t="addWork">Add Work</button>
+            <div id="tomorrowWorkList" class="purchase-list"></div>
+            <button onclick="closeModal('tomorrowModal')" class="close-btn animate-btn" data-t="close">Close</button>
+        </div>
+    </div>
+
+<!-- Stock Page -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<img id="companyLogo" src="logo.png" style="display:none;">
+    
+         
   <script type = "module" src = "script.js"></script>
 </body>
 </html>
