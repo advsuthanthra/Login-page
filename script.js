@@ -1949,7 +1949,7 @@ window.addTomorrowWork=function() {
     );
 }
 
- async function loadPurchases() {
+ window.loadPurchases = async function() {
 
     purchases = [];
 
@@ -1991,18 +1991,7 @@ window. setLanguage = function(lang) {
     updateDisplayRates();
     displayTodayPurchases();
 }
-async function testFirebase() {
 
-    const docRef = await addDoc(
-        collection(db, "test"),
-        {
-            name: "Suthanthra",
-            time: Date.now()
-        }
-    );
-
-    alert("Saved: " + docRef.id);
-}
 
 /*const submitButton = document.getElementById("submit");
 const signupButton = document.getElementById("sign-up");
