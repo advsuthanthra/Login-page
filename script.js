@@ -225,9 +225,9 @@ const englishTranslations = {
     pendingAmount: "Pending Amount",
     customerPending: "No pending amount for this customer"
 };
-let purchases = JSON.parse(localStorage.getItem('purchases')) || [];
-let tomorrowWork = JSON.parse(localStorage.getItem('tomorrowWork')) || [];
-let ratesHistory = JSON.parse(localStorage.getItem('ratesHistory')) || [];
+let purchases = [];
+let tomorrowWork = [];
+//let ratesHistory = JSON.parse(localStorage.getItem('ratesHistory')) || [];
 let currentLanguage = 'english';
 
 const AAC_RATES = {
@@ -294,7 +294,8 @@ if (submitButton) {
                 //alert("vanthutu entered");
                 // TRIGGER THE REDIRECT TO DASHBOARD
                 initializeDashboard();
-                loadPurchases();
+                    loadPurchases();
+                    loadTomorrowWork();
             })
             .catch((error) => {
                 console.error(error.message);
@@ -595,10 +596,6 @@ document.getElementById('paymentMethod').value;
    purchases.push(purchase);
 
 // Local backup
-localStorage.setItem(
-    'purchases',
-    JSON.stringify(purchases)
-);
 
 // Firebase server save
 try {
@@ -638,7 +635,7 @@ document.querySelectorAll('.redBricksRate, .redBricksQty').forEach(el => el.valu
     updateNotificationCounts();
 }
 
-window.editPurchase =function(id) {
+window.editPurchase = async function(id) {
 
 const purchase = purchases.find(p => p.id === id);
 
@@ -694,8 +691,10 @@ if (purchase.redBricksItems && purchase.redBricksItems.length > 0) {
 calculateAll();
 
 purchases = purchases.filter(p => p.id !== id);
-localStorage.setItem('purchases', JSON.stringify(purchases));
 
+await deleteDoc(
+    doc(db, "purchases", firebaseId)
+);
 displayTodayPurchases();
 
 alert("Purchase loaded for editing. Update values and click Add Purchase.");
@@ -1039,7 +1038,7 @@ window.showPreviousDayReport =function() {
         .classList.remove('hidden')
     
 }
-window.receivePending = function(id) {
+window.receivePending = async function(id) {
 
     const amount = parseFloat(
         prompt("Enter received amount")
@@ -1063,10 +1062,21 @@ window.receivePending = function(id) {
         alert("Customer removed from pending list");
     }
 
-    localStorage.setItem(
-        'purchases',
-        JSON.stringify(purchases)
+    try {
+
+    await addDoc(
+        collection(db, "purchases"),
+        purchase
     );
+
+    console.log("Saved to Firebase");
+
+} catch(error) {
+
+    console.error("Firebase Save Error:", error);
+
+}
+    
 
     updateNotificationCounts();
     updateNotifications();
@@ -1888,7 +1898,7 @@ window.displayTomorrowWorkList =function() {
         </div>
     `).join('');
 }
-window.completeTomorrowWork =function(id) {
+window.completeTomorrowWork = async function(id) {
 
     if (!confirm("Mark this work as completed?")) {
         return;
@@ -1896,10 +1906,21 @@ window.completeTomorrowWork =function(id) {
 
     tomorrowWork = tomorrowWork.filter(w => w.id !== id);
 
-    localStorage.setItem(
-        'tomorrowWork',
-        JSON.stringify(tomorrowWork)
+    try {
+
+    await addDoc(
+        collection(db, "tomorrowWork"),
+        purchase
     );
+
+    console.log("Saved to Firebase");
+
+} catch(error) {
+
+    console.error("Firebase Save Error:", error);
+
+}
+    
 
     displayTomorrowWorkList();
 
@@ -1908,7 +1929,7 @@ window.completeTomorrowWork =function(id) {
         "success"
     );
 }
-window.addTomorrowWork=function() {
+window.addTomorrowWork= async function() {
 
     const customerName =
         document.getElementById('tomorrowCustomer').value.trim();
@@ -1932,10 +1953,20 @@ window.addTomorrowWork=function() {
         completed: false
     });
 
-    localStorage.setItem(
-        'tomorrowWork',
-        JSON.stringify(tomorrowWork)
+    try {
+
+    await addDoc(
+        collection(db, "tomorrowWork"),
+        purchase
     );
+
+    console.log("Saved to Firebase");
+
+} catch(error) {
+
+    console.error("Firebase Save Error:", error);
+
+}
 
     document.getElementById('tomorrowCustomer').value = '';
     document.getElementById('tomorrowDate').value = '';
@@ -1992,6 +2023,27 @@ window. setLanguage = function(lang) {
     displayTodayPurchases();
 }
 
+async function loadTomorrowWork() {
+
+    tomorrowWork = [];
+
+    const querySnapshot = await getDocs(
+        collection(db, "tomorrowWork")
+    );
+
+    querySnapshot.forEach((docSnap) => {
+
+        tomorrowWork.push({
+            firebaseId: docSnap.id,
+            ...docSnap.data()
+        });
+
+    });
+
+    console.log("Tomorrow Work Loaded:", tomorrowWork.length);
+
+    displayTomorrowWork();
+}
 
 /*const submitButton = document.getElementById("submit");
 const signupButton = document.getElementById("sign-up");
