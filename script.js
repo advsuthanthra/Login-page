@@ -2044,7 +2044,20 @@ async function loadTomorrowWork() {
 
     displayTomorrowWork();
 }
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
 
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        console.log("Logged in as:", user.email);
+        // Show dashboard
+        showPage('statusPage');
+        // Load all data from Firebase immediately
+        await loadPurchases();
+        await loadTomorrowWork();
+    } else {
+        showPage('loginPage');
+    }
+});
 /*const submitButton = document.getElementById("submit");
 const signupButton = document.getElementById("sign-up");
 const emailInput = document.getElementById("email");
