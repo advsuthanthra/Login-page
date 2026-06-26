@@ -1,16 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs,
-  updateDoc,
-  deleteDoc,
-  doc
-} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
-
+import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 const firebaseConfig = {
     apiKey: "AIzaSyD96y9HGI0EbaVcp9Vg_e1ZAOcWQyMfipE",
     authDomain: "login-44cff.firebaseapp.com",
@@ -516,151 +507,120 @@ window.calculateAll = function() {
 
 
 
-window.addPurchase = async function() {
-    //alert("addpurchase");
-    const customerName = document.getElementById('customerName').value.trim();
-    if (!customerName) {
-        alert("Please enter customer name");
-        document.getElementById('customerName').focus();
-        return;
+window.addPurchase = async function () {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Please login first");
+      return;
     }
-    const date = document.getElementById('purchaseDate').value;
 
-    if (!date) {
-        alert("Please select date");
-        return;
+    const customerName = document.getElementById("customerName").value.trim();
+    const date = document.getElementById("purchaseDate").value;
+    const customerMobile = document.getElementById("customerMobile").value.trim();
+    const deliveryPlace = document.getElementById("deliveryPlace").value.trim();
+    const paymentMethod = document.getElementById("paymentMethod").value;
+
+    if (!customerName || !date) {
+      alert("Please fill required fields");
+      return;
     }
-  const customerMobile =
- document.getElementById('customerMobile').value;
-
-const deliveryPlace =
-document.getElementById('deliveryPlace').value;
-
-const paymentMethod =
-document.getElementById('paymentMethod').value;
 
     let cementItems = [];
     let jalliItems = [];
     let sandItems = [];
     let aacItems = [];
     let redBricksItems = [];
-
     let totalAmount = 0;
 
-    // Cement
-    document.querySelectorAll('.cement-row').forEach(row => {
-        const type = row.querySelector('.cementType').value;
-        const rate = Number(row.querySelector('.cementRate').value || 0);
-        const qty = Number(row.querySelector('.cementQty').value || 0);
-        const total = rate * qty;
-
-        if (qty > 0) {
-            cementItems.push({ type, rate, qty, total });
-            totalAmount += total;
-        }
+    document.querySelectorAll(".cement-row").forEach(row => {
+      const type = row.querySelector(".cementType").value;
+      const rate = Number(row.querySelector(".cementRate").value || 0);
+      const qty = Number(row.querySelector(".cementQty").value || 0);
+      const total = rate * qty;
+      if (qty > 0) cementItems.push({ type, rate, qty, total });
+      totalAmount += total;
     });
 
-    // Jalli
-    document.querySelectorAll('.jalli-row').forEach(row => {
-        const type = row.querySelector('.jalliType').value;
-        const rate = Number(row.querySelector('.jalliRate').value || 0);
-        const qty = Number(row.querySelector('.jalliQty').value || 0);
-        const total = rate * qty;
-
-        if (qty > 0) {
-            jalliItems.push({ type, rate, qty, total });
-            totalAmount += total;
-        }
+    document.querySelectorAll(".jalli-row").forEach(row => {
+      const type = row.querySelector(".jalliType").value;
+      const rate = Number(row.querySelector(".jalliRate").value || 0);
+      const qty = Number(row.querySelector(".jalliQty").value || 0);
+      const total = rate * qty;
+      if (qty > 0) jalliItems.push({ type, rate, qty, total });
+      totalAmount += total;
     });
 
-    // Sand
-    document.querySelectorAll('.sand-row').forEach(row => {
-        const type = row.querySelector('.sandType').value;
-        const rate = Number(row.querySelector('.sandRate').value || 0);
-        const qty = Number(row.querySelector('.sandQty').value || 0);
-        const total = rate * qty;
-
-        if (qty > 0) {
-            sandItems.push({ type, rate, qty, total });
-            totalAmount += total;
-        }
+    document.querySelectorAll(".sand-row").forEach(row => {
+      const type = row.querySelector(".sandType").value;
+      const rate = Number(row.querySelector(".sandRate").value || 0);
+      const qty = Number(row.querySelector(".sandQty").value || 0);
+      const total = rate * qty;
+      if (qty > 0) sandItems.push({ type, rate, qty, total });
+      totalAmount += total;
     });
 
-    // AAC Blocks
-    document.querySelectorAll('.aac-row').forEach(row => {
-        const type = row.querySelector('.aacType').value;
-        const rate = Number(row.querySelector('.aacRate').value || 0);
-        const qty = Number(row.querySelector('.aacQty').value || 0);
-        const total = rate * qty;
-
-        if (qty > 0) {
-            aacItems.push({ type, rate, qty, total });
-            totalAmount += total;
-        }
+    document.querySelectorAll(".aac-row").forEach(row => {
+      const type = row.querySelector(".aacType").value;
+      const rate = Number(row.querySelector(".aacRate").value || 0);
+      const qty = Number(row.querySelector(".aacQty").value || 0);
+      const total = rate * qty;
+      if (qty > 0) aacItems.push({ type, rate, qty, total });
+      totalAmount += total;
     });
 
-    // Red Bricks
-    document.querySelectorAll('.redBricks-row').forEach(row => {
-        const type = row.querySelector('.redBricksType').value;
-        const rate = Number(row.querySelector('.redBricksRate').value || 0);
-        const qty = Number(row.querySelector('.redBricksQty').value || 0);
-        const total = rate * qty;
-
-        if (qty > 0) {
-            redBricksItems.push({ type, rate, qty, total });
-            totalAmount += total;
-        }
+    document.querySelectorAll(".redBricks-row").forEach(row => {
+      const type = row.querySelector(".redBricksType").value;
+      const rate = Number(row.querySelector(".redBricksRate").value || 0);
+      const qty = Number(row.querySelector(".redBricksQty").value || 0);
+      const total = rate * qty;
+      if (qty > 0) redBricksItems.push({ type, rate, qty, total });
+      totalAmount += total;
     });
 
-    const givenAmount =
-        Number(document.getElementById('givenAmount').value || 0);
-
-    const remainingAmount =
-        totalAmount - givenAmount;
+    const givenAmount = Number(document.getElementById("givenAmount").value || 0);
+    const remainingAmount = totalAmount - givenAmount;
 
     const purchase = {
-        id: Date.now(),
-        customerName,
-        date,
-         customerMobile,
-         deliveryPlace,
-         paymentMethod,
-        cementItems,
-        jalliItems,
-        sandItems,
-        aacItems,
-        redBricksItems,
-        totalAmount,
-        givenAmount,
-        remainingAmount
+      id: Date.now(),
+      userId: user.uid,
+      userEmail: user.email,
+      customerName,
+      date,
+      customerMobile,
+      deliveryPlace,
+      paymentMethod,
+      cementItems,
+      jalliItems,
+      sandItems,
+      aacItems,
+      redBricksItems,
+      totalAmount,
+      givenAmount,
+      remainingAmount
     };
 
-   purchases.push(purchase);
-  
-    await addDoc(
-        collection(db, "purchases"),
-        purchase
-    );
-  
-    document.getElementById('customerName').value = '';
-    document.getElementById('givenAmount').value = '';
-    document.getElementById('customerMobile').value = '';
-    document.getElementById('deliveryPlace').value = '';
-    document.getElementById('paymentMethod').value = '';
-    
-    // Clear all quantity and rate fields
-document.querySelectorAll('.cementRate, .cementQty').forEach(el => el.value = '');
-document.querySelectorAll('.jalliRate, .jalliQty').forEach(el => el.value = '');
-document.querySelectorAll('.sandRate, .sandQty').forEach(el => el.value = '');
-document.querySelectorAll('.aacRate, .aacQty').forEach(el => el.value = '');
-document.querySelectorAll('.redBricksRate, .redBricksQty').forEach(el => el.value = '');
+    const docRef = await addDoc(collection(db, "purchases"), purchase);
+    purchases.push({ ...purchase, firebaseId: docRef.id });
 
-    
+    document.getElementById("customerName").value = "";
+    document.getElementById("givenAmount").value = "";
+    document.getElementById("customerMobile").value = "";
+    document.getElementById("deliveryPlace").value = "";
+    document.getElementById("paymentMethod").value = "Cash";
+
+    document.querySelectorAll(".cementRate, .cementQty, .jalliRate, .jalliQty, .sandRate, .sandQty, .aacRate, .aacQty, .redBricksRate, .redBricksQty").forEach(el => el.value = "");
+
     calculateAll();
     updateNotifications();
     displayTodayPurchases();
     updateNotificationCounts();
-}
+    alert("Purchase added successfully!");
+  } catch (error) {
+    console.error("Add purchase error:", error);
+    alert("Error saving purchase");
+  }
+};
 
 window.editPurchase = async function(id) {
 
@@ -1987,27 +1947,34 @@ window.addTomorrowWork= async function() {
     );
 }
 
- window.loadPurchases = async function() {
+ window.loadPurchases = async function () {
+  try {
+    const user = auth.currentUser;
+    if (!user) return;
 
     purchases = [];
-     alert("dicto");
 
-    const querySnapshot =
-        await getDocs(collection(db, "purchases"));
+    const q = query(
+      collection(db, "purchases"),
+      where("userId", "==", user.uid)
+    );
+
+    const querySnapshot = await getDocs(q);
 
     querySnapshot.forEach((docSnap) => {
-
-        purchases.push({
-            firebaseId: docSnap.id,
-            ...docSnap.data()
-        });
-
+      purchases.push({
+        firebaseId: docSnap.id,
+        ...docSnap.data()
+      });
     });
 
     displayTodayPurchases();
     updateNotifications();
-}
-
+    updateNotificationCounts();
+  } catch (error) {
+    console.error("Error loading purchases:", error);
+  }
+};
 window. getTranslation = function(key) {
     return currentLanguage === 'tamil' ? (tamilTranslations[key] || englishTranslations[key] || key) : (englishTranslations[key] || key);
 }
