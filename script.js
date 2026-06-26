@@ -357,12 +357,14 @@ if (createacctbtn) {
 
 
 window.logout = function() {
-    auth.signOut().then(() => {
-        showPage('loginPage');
-        if(emailInput) emailInput.value = '';
-        if(passwordInput) passwordInput.value = '';
-        alert("Logged out", "success");
-    });
+  auth.signOut().then(() => {
+    purchases = [];
+    tomorrowWork = [];
+    showPage('loginPage');
+    if (emailInput) emailInput.value = '';
+    if (passwordInput) passwordInput.value = '';
+    alert("Logged out");
+  });
 };
 
 
@@ -599,9 +601,10 @@ window.addPurchase = async function () {
       givenAmount,
       remainingAmount
     };
-
-    const docRef = await addDoc(collection(db, "purchases"), purchase);
-    purchases.push({ ...purchase, firebaseId: docRef.id });
+const docRef = await addDoc(collection(db, "purchases"), purchase);
+purchases.push({ ...purchase, firebaseId: docRef.id });
+purchase.firebaseId = docRef.id;
+console.log("Saved purchase ID:", docRef.id);
 
     document.getElementById("customerName").value = "";
     document.getElementById("givenAmount").value = "";
@@ -679,7 +682,7 @@ calculateAll();
 
 purchases = purchases.filter(p => p.id !== id);
 
-await deleteDoc(doc(db, "purchases", purchase.firebaseId));
+await updateDoc(doc(db, "purchases", purchase.firebaseId), purchaseData);
 displayTodayPurchases();
 
 alert("Purchase loaded for editing. Update values and click Add Purchase.");
@@ -1047,20 +1050,10 @@ window.receivePending = async function(id) {
         alert("Customer removed from pending list");
     }
 
-    try {
-
-    await addDoc(
-        collection(db, "purchases"),
-        purchase
-    );
-
-    console.log("Saved to Firebase");
-
-} catch(error) {
-
-    console.error("Firebase Save Error:", error);
-
-}
+    await updateDoc(doc(db, "purchases", purchase.firebaseId), {
+  givenAmount: purchase.givenAmount,
+  remainingAmount: purchase.remainingAmount
+});
     
 
     updateNotificationCounts();
@@ -1971,8 +1964,9 @@ window.addTomorrowWork= async function() {
     displayTodayPurchases();
     updateNotifications();
     updateNotificationCounts();
+    console.log("Loaded purchases:", purchases.length);
   } catch (error) {
-    console.error("Error loading purchases:", error);
+    console.error("loadPurchases error:", error);
   }
 };
 window. getTranslation = function(key) {
