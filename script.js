@@ -252,6 +252,27 @@ const sand_RATES = {
     'white M sand': 200,
     'red white M sand': 200
 };
+//const today = new Date();
+//const date = today.toISOString().split('T')[0];
+
+/*window.addEventListener('DOMContentLoaded', () => {
+    const set = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val;
+    };
+
+    set('purchaseDate', date);
+    set('dayReportDate', date);
+    set('salesDayDate', date);
+
+    const month = date.substring(0, 7);
+    set('monthlyReportMonth', month);
+    set('salesMonthlyMonth', month);
+
+    const year = today.getFullYear();
+    set('yearlyReportYear', year);
+    set('salesYearlyYear', year);
+});*/
 
 window.showPage = function(pageId) {
     //alert("showpage vabthutya");
@@ -280,6 +301,16 @@ function initializeDashboard() {
 const submitButton = document.getElementById("submit"); // Your Login Button ID
 const emailInput = document.getElementById("email");      // Your Email Input ID
 const passwordInput = document.getElementById("password"); // Your Password Input ID
+const signupButton = document.getElementById("sign-up");
+const createacct = document.getElementById("create-acct")
+
+const signupEmailIn = document.getElementById("email-signup");
+const confirmSignupEmailIn = document.getElementById("confirm-email-signup");
+const signupPasswordIn = document.getElementById("password-signup");
+const confirmSignUpPasswordIn = document.getElementById("confirm-password-signup");
+const createacctbtn = document.getElementById("create-acct-btn");
+
+const returnBtn = document.getElementById("return-btn");
 
 if (submitButton) {
     submitButton.addEventListener("click", function() {
@@ -293,9 +324,9 @@ if (submitButton) {
                 //showNotification("Login Successful!", "success");
                 //alert("vanthutu entered");
                 // TRIGGER THE REDIRECT TO DASHBOARD
-                initializeDashboard();
-                    loadPurchases();
-                    loadTomorrowWork();
+                    initializeDashboard();
+                     loadPurchases();
+                     loadTomorrowWork();
             })
             .catch((error) => {
                 console.error(error.message);
@@ -308,9 +339,17 @@ if (submitButton) {
             });
     });
 }
+signupButton.addEventListener("click", function() {
+    main.style.display = "none";
+    createacct.style.display = "block";
+});
+returnBtn.addEventListener("click", function() {
+    main.style.display = "block";
+    createacct.style.display = "none";
+});
 
 // 5. SIGN UP INTEGRATION
-const createacctbtn = document.getElementById("create-acct-btn");
+//const createacctbtn = document.getElementById("create-acct-btn");
 if (createacctbtn) {
     createacctbtn.addEventListener("click", function() {
         const signupEmail = document.getElementById("email-signup").value;
@@ -334,6 +373,9 @@ window.logout = function() {
         alert("Logged out", "success");
     });
 };
+
+
+
 //function showPendingReport() {
     window.showPendingReport = function() {
     const pendingPurchases = purchases.filter(p => p.remainingAmount > 0);
@@ -488,7 +530,7 @@ window.addPurchase = async function() {
         alert("Please select date");
         return;
     }
-    const customerMobile =
+  const customerMobile =
  document.getElementById('customerMobile').value;
 
 const deliveryPlace =
@@ -594,27 +636,12 @@ document.getElementById('paymentMethod').value;
     };
 
    purchases.push(purchase);
-
-// Local backup
-
-// Firebase server save
-try {
-
+  
     await addDoc(
         collection(db, "purchases"),
         purchase
     );
-
-    console.log("Saved to Firebase");
-
-} catch(error) {
-
-    console.error("Firebase Save Error:", error);
-
-}
-
-    alert("Purchase Added Successfully");
-
+  
     document.getElementById('customerName').value = '';
     document.getElementById('givenAmount').value = '';
     document.getElementById('customerMobile').value = '';
@@ -1905,23 +1932,14 @@ window.completeTomorrowWork = async function(id) {
     }
 
     tomorrowWork = tomorrowWork.filter(w => w.id !== id);
-
-    try {
+  
 
     await addDoc(
         collection(db, "tomorrowWork"),
-        purchase
+        tomorrowWork
     );
 
-    console.log("Saved to Firebase");
-
-} catch(error) {
-
-    console.error("Firebase Save Error:", error);
-
-}
-    
-
+      
     displayTomorrowWorkList();
 
     showNotification(
@@ -1952,21 +1970,12 @@ window.addTomorrowWork= async function() {
         work,
         completed: false
     });
-
-    try {
-
+  
     await addDoc(
         collection(db, "tomorrowWork"),
-        purchase
+        tomorrowWork
     );
-
-    console.log("Saved to Firebase");
-
-} catch(error) {
-
-    console.error("Firebase Save Error:", error);
-
-}
+  
 
     document.getElementById('tomorrowCustomer').value = '';
     document.getElementById('tomorrowDate').value = '';
@@ -1983,6 +1992,7 @@ window.addTomorrowWork= async function() {
  window.loadPurchases = async function() {
 
     purchases = [];
+     alert("dicto");
 
     const querySnapshot =
         await getDocs(collection(db, "purchases"));
@@ -2023,9 +2033,11 @@ window. setLanguage = function(lang) {
     displayTodayPurchases();
 }
 
-async function loadTomorrowWork() {
+window·loadTomorrowWork = async function() {
 
     tomorrowWork = [];
+  
+    alert("tommorrow");
 
     const querySnapshot = await getDocs(
         collection(db, "tomorrowWork")
@@ -2040,13 +2052,14 @@ async function loadTomorrowWork() {
 
     });
 
-    console.log("Tomorrow Work Loaded:", tomorrowWork.length);
+    //console.log("Tomorrow Work Loaded:", tomorrowWork.length);
 
     displayTomorrowWork();
 }
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
 
-onAuthStateChanged(auth, async (user) => {
+//import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+
+/*onAuthStateChanged(auth, async (user) => {
     if (user) {
         console.log("Logged in as:", user.email);
         // Show dashboard
@@ -2057,21 +2070,13 @@ onAuthStateChanged(auth, async (user) => {
     } else {
         showPage('loginPage');
     }
-});
+});*/
 /*const submitButton = document.getElementById("submit");
-const signupButton = document.getElementById("sign-up");
+
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const main = document.getElementById("main");
-const createacct = document.getElementById("create-acct")
 
-const signupEmailIn = document.getElementById("email-signup");
-const confirmSignupEmailIn = document.getElementById("confirm-email-signup");
-const signupPasswordIn = document.getElementById("password-signup");
-const confirmSignUpPasswordIn = document.getElementById("confirm-password-signup");
-const createacctbtn = document.getElementById("create-acct-btn");
-
-const returnBtn = document.getElementById("return-btn");
 
 var email, password, signupEmail, signupPassword, confirmSignupEmail, confirmSignUpPassword;
 
@@ -2142,15 +2147,9 @@ submitButton.addEventListener("click", function() {
     });
 });
 
-signupButton.addEventListener("click", function() {
-    main.style.display = "none";
-    createacct.style.display = "block";
-});
 
-returnBtn.addEventListener("click", function() {
-    main.style.display = "block";
-    createacct.style.display = "none";
-});
+
+
    
 */
 
@@ -2175,6 +2174,7 @@ if (todayRates) {
     document.getElementById('aacRate').value = AAC_RATES['6inch'];
 }
 
+
 //function updateDisplayRates() {
 
 window.updateSummary= function(cementBags, cementRate, cementTotal, jalli, jalliRate, jalliTotal, sand, sandRate, sandTotal, redBricks, redBricksRate, redBricksTotal, aacBlocks, aacRate, aacTotal, total) {
@@ -2187,13 +2187,6 @@ window.updateSummary= function(cementBags, cementRate, cementTotal, jalli, jalli
 }
 
 
-document.getElementById('purchaseDate').value = new Date().toISOString().split('T')[0];
-document.getElementById('dayReportDate').value = new Date().toISOString().split('T')[0];
-document.getElementById('salesDayDate').value = new Date().toISOString().split('T')[0];
-document.getElementById('monthlyReportMonth').value = new Date().toISOString().split('T')[0].substring(0, 7);
-document.getElementById('salesMonthlyMonth').value = new Date().toISOString().split('T')[0].substring(0, 7);
-document.getElementById('yearlyReportYear').value = new Date().getFullYear();
-document.getElementById('salesYearlyYear').value = new Date().getFullYear();
 
 window.updateDisplayRates = function(){
    
