@@ -719,9 +719,7 @@ calculateAll();
 
 purchases = purchases.filter(p => p.id !== id);
 
-await deleteDoc(
-    doc(db, "purchases", firebaseId)
-);
+await deleteDoc(doc(db, "purchases", purchase.firebaseId));
 displayTodayPurchases();
 
 alert("Purchase loaded for editing. Update values and click Add Purchase.");
@@ -2033,44 +2031,32 @@ window. setLanguage = function(lang) {
     displayTodayPurchases();
 }
 
-window·loadTomorrowWork = async function() {
-
+window.loadTomorrowWork = async function() {
     tomorrowWork = [];
-  
-    alert("tommorrow");
-
-    const querySnapshot = await getDocs(
-        collection(db, "tomorrowWork")
-    );
-
-    querySnapshot.forEach((docSnap) => {
-
-        tomorrowWork.push({
-            firebaseId: docSnap.id,
-            ...docSnap.data()
+    try {
+        const querySnapshot = await getDocs(collection(db, "tomorrowWork"));
+        querySnapshot.forEach((docSnap) => {
+            tomorrowWork.push({ firebaseId: docSnap.id, ...docSnap.data() });
         });
-
-    });
-
-    //console.log("Tomorrow Work Loaded:", tomorrowWork.length);
-
-    displayTomorrowWork();
+        displayTomorrowWorkList(); // CORRECT NAME
+    } catch (e) {
+        console.error("Error loading tomorrow work", e);
+    }
 }
 
-//import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
 
-/*onAuthStateChanged(auth, async (user) => {
+// This runs automatically on every app refresh/start
+onAuthStateChanged(auth, (user) => {
     if (user) {
-        console.log("Logged in as:", user.email);
-        // Show dashboard
-        showPage('statusPage');
-        // Load all data from Firebase immediately
-        await loadPurchases();
-        await loadTomorrowWork();
+        console.log("User detected, loading data...");
+        initializeDashboard(); // Shows statusPage
+        loadPurchases();       // Fetches from Firestore
+        loadTomorrowWork();    // Fetches from Firestore
     } else {
         showPage('loginPage');
     }
-});*/
+});
 /*const submitButton = document.getElementById("submit");
 
 const emailInput = document.getElementById("email");
