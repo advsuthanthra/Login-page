@@ -360,10 +360,10 @@ window.logout = function() {
   auth.signOut().then(() => {
     purchases = [];
     tomorrowWork = [];
+    displayTodayPurchases();
+    updateNotifications();
+    updateNotificationCounts();
     showPage('loginPage');
-    if (emailInput) emailInput.value = '';
-    if (passwordInput) passwordInput.value = '';
-    alert("Logged out");
   });
 };
 
@@ -1952,9 +1952,8 @@ window.addTomorrowWork= async function() {
       where("userId", "==", user.uid)
     );
 
-    const querySnapshot = await getDocs(q);
-
-    querySnapshot.forEach((docSnap) => {
+    const snap = await getDocs(q);
+    snap.forEach(docSnap => {
       purchases.push({
         firebaseId: docSnap.id,
         ...docSnap.data()
@@ -1964,7 +1963,6 @@ window.addTomorrowWork= async function() {
     displayTodayPurchases();
     updateNotifications();
     updateNotificationCounts();
-    console.log("Loaded purchases:", purchases.length);
   } catch (error) {
     console.error("loadPurchases error:", error);
   }
