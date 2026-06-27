@@ -243,8 +243,20 @@ const sand_RATES = {
     'white M sand': 200,
     'red white M sand': 200
 };
-//const today = new Date();
-//const date = today.toISOString().split('T')[0];
+const today = new Date();
+today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+
+
+document.getElementById("tomorrowDate").value =
+    today.toISOString().split("T")[0];
+document.getElementById("purchaseDate").value =
+    today.toISOString().split("T")[0];
+document.getElementById("monthlyReportMonth").value =
+    today.toISOString().split("T")[0];
+document.getElementById("dayReportDate").value =
+    today.toISOString().split("T")[0];
+document.getElementById("monthlyReportMonth").value =
+    today.toISOString().substring(0, 7);
 
 /*window.addEventListener('DOMContentLoaded', () => {
     const set = (id, val) => {
@@ -446,7 +458,7 @@ window.closeModal = function(modalId) {
 window.calculateAll = function() {
 
     let totalAmount = 0;
-   alert("calculate vanthuta");
+   //alert("calculate vanthuta");
     // Cement
     document.querySelectorAll('.cement-row').forEach(row => {
         const rate = Number(row.querySelector('.cementRate').value || 0);
@@ -1883,15 +1895,13 @@ window.completeTomorrowWork = async function(id) {
         return;
     }
 
+    const work = tomorrowWork.find(w => w.id === id);
+    if (!work) return;
+
+    await deleteDoc(doc(db, "tomorrowWork", work.firebaseId));
+
     tomorrowWork = tomorrowWork.filter(w => w.id !== id);
-  
 
-    await addDoc(
-        collection(db, "tomorrowWork"),
-        tomorrowWork
-    );
-
-      
     displayTomorrowWorkList();
 
     showNotification(
@@ -1899,35 +1909,39 @@ window.completeTomorrowWork = async function(id) {
         "success"
     );
 }
-window.addTomorrowWork= async function() {
+window.addTomorrowWork = async function () {
 
-    const customerName =
-        document.getElementById('tomorrowCustomer').value.trim();
+    const user = auth.currentUser;
+    if (!user) return;
 
-    const date =
-        document.getElementById('tomorrowDate').value;
-
-    const work =
-        document.getElementById('tomorrowWork').value.trim();
+    const customerName = document.getElementById('tomorrowCustomer').value.trim();
+    const date = document.getElementById('tomorrowDate').value;
+    const work = document.getElementById('tomorrowWork').value.trim();
 
     if (!customerName || !date || !work) {
         showNotification(getTranslation('fillFields'), 'error');
         return;
     }
 
-    tomorrowWork.push({
+    const tomorrowWorkData = {
         id: Date.now(),
         customerName,
         date,
         work,
-        completed: false
-    });
-  
-    await addDoc(
+        completed: false,
+        userId: user.uid,
+        userEmail: user.email
+    };
+
+    const docRef = await addDoc(
         collection(db, "tomorrowWork"),
-        tomorrowWork
+        tomorrowWorkData
     );
-  
+
+    tomorrowWork.push({
+        firebaseId: docRef.id,
+        ...tomorrowWorkData
+    });
 
     document.getElementById('tomorrowCustomer').value = '';
     document.getElementById('tomorrowDate').value = '';
@@ -1939,7 +1953,7 @@ window.addTomorrowWork= async function() {
         'Tomorrow work added successfully',
         'success'
     );
-}
+};
 
  window.loadPurchases = async function () {
     try {
@@ -1993,20 +2007,41 @@ window. setLanguage = function(lang) {
     displayTodayPurchases();
 }
 
-window.loadTomorrowWork = async function() {
-    tomorrowWork = [];
+window.loadTomorrowWork = async function () {
     try {
-        const querySnapshot = await getDocs(collection(db, "tomorrowWork"));
-        querySnapshot.forEach((docSnap) => {
-            tomorrowWork.push({ firebaseId: docSnap.id, ...docSnap.data() });
-        });
-        displayTomorrowWorkList(); // CORRECT NAME
-    } catch (e) {
-        console.error("Error loading tomorrow work", e);
-    }
-}
+        const user = auth.currentUser;
+        if (!user) return;
 
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+        const q = query(
+            collection(db, "tomorrowWork"),
+            where("userId", "==", user.uid)
+        );
+
+        const snap = await getDocs(q);
+
+        const tempTomorrowWork = [];
+
+snap.forEach((docSnap) => {
+    tempTomorrowWork.push({
+        firebaseId: docSnap.id,
+        ...docSnap.data()
+    });
+});
+
+tomorrowWork = tempTomorrowWork;
+        
+        console.log("Loaded Tomorrow Work:", tomorrowWork);
+
+        displayTomorrowWork(); // Your function to display tomorrow work
+        updateNotifications();
+        updateNotificationCounts();
+
+    } catch (error) {
+        console.error("Error loading tomorrow work:", error);
+    }
+};
+
+/*import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
 
 // This runs automatically on every app refresh/start
 onAuthStateChanged(auth, (user) => {
@@ -2018,7 +2053,7 @@ onAuthStateChanged(auth, (user) => {
     } else {
         showPage('loginPage');
     }
-});
+});*/
 displayTodayPurchases();
 updateNotificationCounts();
 //updateDisplayRates();
