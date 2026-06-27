@@ -274,7 +274,7 @@ window.showPage = function(pageId) {
         updateNotifications();
         displayTodayPurchases();
         updateNotificationCounts();
-        updateDisplayRates();
+        //updateDisplayRates();
         calculateAll();
         
     }
@@ -304,7 +304,7 @@ const createacctbtn = document.getElementById("create-acct-btn");
 const returnBtn = document.getElementById("return-btn");
 
 if (submitButton) {
-    submitButton.addEventListener("click", function() {
+    submitButton.addEventListener("click", async function() {
        const  email = emailInput.value;
         const password = passwordInput.value;
 
@@ -315,9 +315,10 @@ if (submitButton) {
                 //showNotification("Login Successful!", "success");
                 //alert("vanthutu entered");
                 // TRIGGER THE REDIRECT TO DASHBOARD
+                   loadPurchases();
+                   loadTomorrowWork();
                     initializeDashboard();
-                     loadPurchases();
-                     loadTomorrowWork();
+                     
             })
             .catch((error) => {
                 console.error(error.message);
@@ -858,15 +859,15 @@ window.showPreviousDayReport =function() {
         );
 
         const cashTotal = data
-            .filter(p => p.paymentMode === 'Cash')
+            .filter(p => p.paymentMethod === 'Cash')
             .reduce((sum, p) => sum + Number(p.givenAmount || 0), 0);
 
         const gpayTotal = data
-            .filter(p => p.paymentMode === 'GPay')
+            .filter(p => p.paymentMethod === 'GPay')
             .reduce((sum, p) => sum + Number(p.givenAmount || 0), 0);
 
         const phonePeTotal = data
-            .filter(p => p.paymentMode === 'PhonePe')
+            .filter(p => p.paymentMethod === 'PhonePe')
             .reduce((sum, p) => sum + Number(p.givenAmount || 0), 0);
 
         container.innerHTML = `
@@ -926,7 +927,7 @@ window.showPreviousDayReport =function() {
 
                                 <td>${p.deliveryPlace || '-'}</td>
 
-                                <td>${p.paymentMode || 'Cash'}</td>
+                                <td>${p.paymentMethod || 'Cash'}</td>
 
                                 <td>
                                     ${(p.cementItems || [])
@@ -1941,31 +1942,33 @@ window.addTomorrowWork= async function() {
 }
 
  window.loadPurchases = async function () {
-  try {
-    const user = auth.currentUser;
-    if (!user) return;
+    try {
+        const user = auth.currentUser;
+        if (!user) return;
 
-    purchases = [];
+        const q = query(
+            collection(db, "purchases"),
+            where("userId", "==", user.uid)
+        );
 
-    const q = query(
-      collection(db, "purchases"),
-      where("userId", "==", user.uid)
-    );
+        const snap = await getDocs(q);
+        const tempPurchases = []; // Use a temporary array
+        snap.forEach(docSnap => {
+            tempPurchases.push({
+                firebaseId: docSnap.id,
+                ...docSnap.data()
+            });
+        });
+        
+        purchases = tempPurchases; // Update the global array
 
-    const snap = await getDocs(q);
-    snap.forEach(docSnap => {
-      purchases.push({
-        firebaseId: docSnap.id,
-        ...docSnap.data()
-      });
-    });
-
-    displayTodayPurchases();
-    updateNotifications();
-    updateNotificationCounts();
-  } catch (error) {
-    console.error("loadPurchases error:", error);
-  }
+        // CRITICAL: Call display functions AFTER data is loaded
+        displayTodayPurchases();
+        updateNotifications();
+        updateNotificationCounts();
+    } catch (error) {
+        console.error("loadPurchases error:", error);
+    }
 };
 window. getTranslation = function(key) {
     return currentLanguage === 'tamil' ? (tamilTranslations[key] || englishTranslations[key] || key) : (englishTranslations[key] || key);
@@ -1986,7 +1989,7 @@ window. setLanguage = function(lang) {
         el.placeholder = getTranslation(key);
     });
 
-    updateDisplayRates();
+    //updateDisplayRates();
     displayTodayPurchases();
 }
 
@@ -2016,184 +2019,7 @@ onAuthStateChanged(auth, (user) => {
         showPage('loginPage');
     }
 });
-/*const submitButton = document.getElementById("submit");
-
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const main = document.getElementById("main");
-
-
-var email, password, signupEmail, signupPassword, confirmSignupEmail, confirmSignUpPassword;
-
-createacctbtn.addEventListener("click", function() {
-  var isVerified = true;
-
-  signupEmail = signupEmailIn.value;
-  confirmSignupEmail = confirmSignupEmailIn.value;
-  if(signupEmail != confirmSignupEmail) {
-      window.alert("Email fields do not match. Try again.")
-      isVerified = false;
-  }
-
-  signupPassword = signupPasswordIn.value;
-  confirmSignUpPassword = confirmSignUpPasswordIn.value;
-  if(signupPassword != confirmSignUpPassword) {
-      window.alert("Password fields do not match. Try again.")
-      isVerified = false;
-  }
-  
-  if(signupEmail == null || confirmSignupEmail == null || signupPassword == null || confirmSignUpPassword == null) {
-    window.alert("Please fill out all required fields.");
-    isVerified = false;
-  }
-  
-  if(isVerified) {
-    createUserWithEmailAndPassword(auth, signupEmail, signupPassword)
-      .then((userCredential) => {
-      // Signed in 
-      const user = userCredential.user;
-      // ...
-      window.alert("Success! Account created.");
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // ..
-      window.alert("Error occurred. Try again.");
-    });
-  }
-});
-
-submitButton.addEventListener("click", function() {
-  email = emailInput.value;
-  console.log(email);
-  password = passwordInput.value;
-  console.log(password);
-
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-        alert("Login Success");
-        document.getElementById("loginPage").style.display = "none";
-        document.getElementById("statusPage").style.display = "block";
-        
-      // Signed in
-      const user = userCredential.user;
-      console.log("Success! Welcome back!");
-      window.alert("Success! Welcome back!");
-        
-        //
-      // ...
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log("Error occurred. Try again.");
-      window.alert("Error occurred. Try again.");
-    });
-});
-
-
-
-
-   
-*/
-
-const tomorrow = new Date();
-tomorrow.setDate(tomorrow.getDate() + 1);
-document.getElementById('tomorrowDate').value = tomorrow.toISOString().split('T')[0];
-
-const today = new Date().toISOString().split('T')[0];
-const todayRates = ratesHistory.find(r => r.date === today);
-
-if (todayRates) {
-    document.getElementById('cementRate').value = todayRates.cement || 400;
-    document.getElementById('jalliRate').value = todayRates.jalli || 1200;
-    document.getElementById('sandRate').value = todayRates.sand || 1000;
-    document.getElementById('redBricksRate').value = todayRates.redBricks || 10;
-    document.getElementById('aacRate').value = todayRates.aac || AAC_RATES['6inch'];
-} else {
-    document.getElementById('cementRate').value = 400;
-    document.getElementById('jalliRate').value = 1200;
-    document.getElementById('sandRate').value = 1000;
-    document.getElementById('redBricksRate').value = 10;
-    document.getElementById('aacRate').value = AAC_RATES['6inch'];
-}
-
-
-//function updateDisplayRates() {
-
-window.updateSummary= function(cementBags, cementRate, cementTotal, jalli, jalliRate, jalliTotal, sand, sandRate, sandTotal, redBricks, redBricksRate, redBricksTotal, aacBlocks, aacRate, aacTotal, total) {
-    document.getElementById('summaryCement').textContent = `${cementBags} bags × ₹${cementRate} = ₹${cementTotal}`;
-    document.getElementById('summaryJalli').textContent = `${jalli} tons × ₹${jalliRate} = ₹${jalliTotal}`;
-    document.getElementById('summarySand').textContent = `${sand} tons × ₹${sandRate} = ₹${sandTotal}`;
-    document.getElementById('summaryRedBricks').textContent = `${redBricks} pcs × ₹${redBricksRate} = ₹${redBricksTotal}`;
-    document.getElementById('summaryAac').textContent = `${aacBlocks} pcs × ₹${aacRate} = ₹${aacTotal}`;
-    document.getElementById('summaryTotal').textContent = `₹${total}`;
-}
-
-
-
-window.updateDisplayRates = function(){
-   
-    const cementRate = parseFloat(document.getElementById('cementRate').value) || 400;
-    //alert("rate epp?");
-    const jalliRate = parseFloat(document.getElementById('jalliRate').value) || 1200;
-    const sandRate = parseFloat(document.getElementById('sandRate').value) || 1000;
-    const redBricksRate = parseFloat(document.getElementById('redBricksRate').value) || 10;
-
-    //alert("rate epp 2??????");
-    document.getElementById('displayCementRate').textContent = `₹${cement_RATES['dalmia']}/bag`;
-    //alert("rate epp 3??????");
-    document.getElementById('displayCementRate').textContent = `₹${cement_RATES['ultratech']}/bag`;
-    document.getElementById('displayJalliRate').textContent = `₹${jalli_RATES['3/4 jalli']}/unit`;
-    document.getElementById('displayJalliRate').textContent = `₹${jalli_RATES['1 1/2 Jalli']}/unit`;
-    document.getElementById('displayJalliRate').textContent = `₹${jalli_RATES['Chips']}/unit`;
-    document.getElementById('displayJalliRate').textContent = `₹${jalli_RATES['Gravel']}/unit`;
-    document.getElementById('displaySandRate').textContent = `₹${sand_RATES['M sand']}/unit`;
-    document.getElementById('displaySandRate').textContent = `₹${sand_RATES['P sand']}/unit`;
-    document.getElementById('displaySandRate').textContent = `₹${sand_RATES['white M sand']}/unit`;
-    document.getElementById('displaySandRate').textContent = `₹${sand_RATES['red white M sand']}/unit`;
-    document.getElementById('displayRedBricksRate').textContent = `₹${redBricksRate}/pc`;
-    document.getElementById('displayAac4Rate').textContent = `₹${AAC_RATES['4inch']}/pc`;
-    document.getElementById('displayAac6Rate').textContent = `₹${AAC_RATES['6inch']}/pc`;
-    document.getElementById('displayAac9Rate').textContent = `₹${AAC_RATES['9inch']}/pc`;
-    
-    //alert("rate epp ??????");
-}
-
-
-/*function logout() {
-    showPage('loginPage');
-    document.getElementById('passwordInput').value = '';
-    document.getElementById('loginError').style.display = 'none';
-    closeNotifications();
-}*/
-
-//displayTodayPurchases();
-//updateNotificationCounts();
+displayTodayPurchases();
+updateNotificationCounts();
 //updateDisplayRates();
-//calculateAll();
-
-  /*document.getElementById('aacType').addEventListener('change', function () {
-    const type = this.value;
-    document.getElementById('aacRate').value = AAC_RATES[type];
-    calculateAll();
-});
-document.getElementById('cementType').addEventListener('change', function () {
-    const type = this.value;
-    document.getElementById('cementRate').value = cement_RATES[type];
-    calculateAll();
-});
-document.getElementById('jalliType').addEventListener('change', function () {
-    const type = this.value;
-    document.getElementById('jalliRate').value = jalli_RATES[type];
-    calculateAll();
-});
-document.getElementById('sandType').addEventListener('change', function () {
-    const type = this.value;
-    document.getElementById('sandRate').value = sand_RATES[type];
-    calculateAll();
-});
-  
-*/
-
+calculateAll();
